@@ -2,7 +2,8 @@
 //
 
 #include "stdafx.h"
-#include "Combo.h"
+#include "resource.h"
+#include "../Utils/Util.h"
 #include "App.h"
 
 #define MAX_LOADSTRING 100
@@ -177,9 +178,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		// with width=0 and height=0.
 		if (wParam != SIZE_MINIMIZED)
 		{
-			int width = lParam & 0xffff;
-			int height = lParam & 0xffff0000 >> 16;
-			DoResize(width, height);
+			int Width = lParam & 0x0000ffff;
+			int Height = (lParam & 0xffff0000) >> 16;
+			DoResize(Width, Height);
 		}
 		break;
 	case WM_CHAR:
@@ -195,11 +196,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				break;
 			case 'P':
 			case 'p':
-				GRequestControl.DoPost = !GRequestControl.DoPost;
+				GRequestControl.bDoPost = !GRequestControl.bDoPost;
 				break;
 			case 'M':
 			case 'm':
-				GRequestControl.DoMSAA = !GRequestControl.DoMSAA;
+				GRequestControl.bDoMSAA = !GRequestControl.bDoMSAA;
 				break;
 			default:
 				break;

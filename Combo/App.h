@@ -15,8 +15,8 @@ struct FControl
 	FVector3 StepDirection;
 	FVector4 CameraPos;
 	EViewMode ViewMode;
-	bool DoPost;
-	bool DoMSAA;
+	bool bDoPost;
+	bool bDoMSAA;
 
 	FControl();
 };

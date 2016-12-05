@@ -2,13 +2,16 @@
 
 #include "stdafx.h"
 #include "App.h"
+#include "../Engine/Engine.h"
+
+static FEngine* GEngine = nullptr;
 
 FControl::FControl()
 	: StepDirection{ 0, 0, 0 }
 	, CameraPos{ 0, 0, -10, 1 }
 	, ViewMode(EViewMode::Solid)
-	, DoPost(!true)
-	, DoMSAA(false)
+	, bDoPost(!true)
+	, bDoMSAA(false)
 {
 }
 
@@ -43,6 +46,18 @@ bool DoInit(HINSTANCE hInstance, HWND hWnd, uint32& Width, uint32& Height)
 		}
 	}
 	check(bVulkan ^ bD3D12);
+	if (bVulkan)
+	{
+		GEngine = CreateVulkanEngine();
+	}
+	else
+	{
+		GEngine = CreateD3D12Engine();
+	}
+
+	GEngine->CreateInstance(hInstance, hWnd);
+	GEngine->CreateDevice();
+
 	return true;
 }
 
@@ -58,5 +73,5 @@ void DoResize(uint32 Width, uint32 Height)
 
 void DoDeinit()
 {
-
+	GEngine->Deinit();
 }
