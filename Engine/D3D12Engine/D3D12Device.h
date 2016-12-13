@@ -1,4 +1,4 @@
-// VulkanDevice.h
+// D3D12Device.h
 
 #pragma once
 #include <dxgi1_4.h>
@@ -10,7 +10,7 @@
 
 #define checkD3D12(r) do { HRESULT hr = r; check(SUCCEEDED(hr)); hr = hr; } while (0)
 
-struct FInstance
+struct FD3D12Instance
 {
 	void CreateInstance()
 	{
@@ -32,8 +32,6 @@ struct FInstance
 		CreateInstance();
 	}
 
-	void CreateDevice(struct FDevice& OutDevice);
-
 	void Destroy()
 	{
 		DestroyInstance();
@@ -41,4 +39,35 @@ struct FInstance
 
 	Microsoft::WRL::ComPtr<ID3D12Debug> DebugInterface;
 	Microsoft::WRL::ComPtr<IDXGIFactory4> DXGIFactory;
+};
+
+struct FD3D12Device
+{
+	Microsoft::WRL::ComPtr<ID3D12Device> Device;
+	Microsoft::WRL::ComPtr<IDXGIAdapter1> Adapter;
+	Microsoft::WRL::ComPtr<ID3D12CommandQueue> Queue;
+
+	void Create()
+	{
+		checkD3D12(D3D12CreateDevice(Adapter.Get(), D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), &Device));
+
+		D3D12_COMMAND_QUEUE_DESC QueueDesc;
+		MemZero(QueueDesc);
+		QueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+		QueueDesc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
+		QueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+		checkD3D12(Device->CreateCommandQueue(&QueueDesc, IID_PPV_ARGS(&Queue)));
+	}
+
+	void Destroy()
+	{
+		Queue = nullptr;
+		Device = nullptr;
+		Adapter = nullptr;
+	}
+
+	operator ID3D12Device* ()
+	{
+		return Device.Get();
+	}
 };

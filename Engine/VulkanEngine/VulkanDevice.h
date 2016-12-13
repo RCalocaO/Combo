@@ -9,7 +9,7 @@
 
 #define checkVk(r) check((r) == VK_SUCCESS)
 
-struct FInstance
+struct FVulkanInstance
 {
 	VkSurfaceKHR Surface = VK_NULL_HANDLE;
 	VkInstance Instance = VK_NULL_HANDLE;
@@ -110,12 +110,55 @@ struct FInstance
 		CreateSurface(hInstance, hWnd);
 	}
 
-	void CreateDevice(struct FDevice& OutDevice);
-
 	void Destroy()
 	{
 		DestroySurface();
 		DestroyDebugCallback();
 		DestroyInstance();
+	}
+};
+
+struct FVulkanDevice
+{
+	VkPhysicalDevice PhysicalDevice = VK_NULL_HANDLE;
+	VkDevice Device = VK_NULL_HANDLE;
+	VkPhysicalDeviceProperties DeviceProperties;
+	uint32 PresentQueueFamilyIndex = UINT32_MAX;
+	VkQueue PresentQueue = VK_NULL_HANDLE;
+
+	void Create(std::vector<const char*>& Layers)
+	{
+		VkPhysicalDeviceFeatures DeviceFeatures;
+		vkGetPhysicalDeviceFeatures(PhysicalDevice, &DeviceFeatures);
+
+		VkDeviceQueueCreateInfo QueueInfo;
+		MemZero(QueueInfo);
+		QueueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+		QueueInfo.queueFamilyIndex = PresentQueueFamilyIndex;
+		QueueInfo.queueCount = 1;
+		float Priorities[1] = { 1.0f };
+		QueueInfo.pQueuePriorities = Priorities;
+
+		const char* DeviceExtensions[] = { "VK_KHR_swapchain" };
+
+		VkDeviceCreateInfo DeviceInfo;
+		MemZero(DeviceInfo);
+		DeviceInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+		DeviceInfo.queueCreateInfoCount = 1;
+		DeviceInfo.pQueueCreateInfos = &QueueInfo;
+		DeviceInfo.enabledLayerCount = (uint32)Layers.size();
+		DeviceInfo.ppEnabledLayerNames = Layers.size() > 0 ? &Layers[0] : nullptr;
+		DeviceInfo.enabledExtensionCount = 1;
+		DeviceInfo.ppEnabledExtensionNames = DeviceExtensions;
+		DeviceInfo.pEnabledFeatures = &DeviceFeatures;
+		checkVk(vkCreateDevice(PhysicalDevice, &DeviceInfo, nullptr, &Device));
+
+		vkGetDeviceQueue(Device, PresentQueueFamilyIndex, 0, &PresentQueue);
+	}
+
+	void Destroy()
+	{
+		vkDestroyDevice(Device, nullptr);
+		Device = VK_NULL_HANDLE;
 	}
 };

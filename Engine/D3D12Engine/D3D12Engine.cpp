@@ -19,6 +19,12 @@ FD3D12Engine::~FD3D12Engine()
 
 void FD3D12Engine::Deinit()
 {
+	for (auto* Device : Devices)
+	{
+		Device->Destroy();
+		delete Device;
+	}
+	Devices.clear();
 }
 
 bool FD3D12Engine::CreateInstance(HINSTANCE hInstance, HWND hWnd)
@@ -30,5 +36,8 @@ bool FD3D12Engine::CreateInstance(HINSTANCE hInstance, HWND hWnd)
 
 bool FD3D12Engine::CreateDevice()
 {
+	auto* Device = new FD3D12Device;
+	Device->Create();
+	Devices.push_back(Device);
 	return true;
 }

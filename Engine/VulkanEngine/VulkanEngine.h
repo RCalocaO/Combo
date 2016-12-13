@@ -15,5 +15,6 @@ struct FVulkanEngine : public FEngine
 	virtual bool CreateDevice() override;
 
 
-	FInstance Instance;
+	FVulkanInstance Instance;
+	std::vector<FVulkanDevice*> Devices;
 };

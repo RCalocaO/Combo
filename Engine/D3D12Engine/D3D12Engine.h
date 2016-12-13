@@ -15,5 +15,6 @@ struct FD3D12Engine : public FEngine
 	virtual bool CreateDevice() override;
 
 
-	FInstance Instance;
+	FD3D12Instance Instance;
+	std::vector<FD3D12Device*> Devices;
 };

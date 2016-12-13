@@ -5,7 +5,7 @@
 
 static bool GSkipValidation = false;
 
-void FInstance::SetupDebugLayer()
+void FD3D12Instance::SetupDebugLayer()
 {
 	if (!GSkipValidation)
 	{
